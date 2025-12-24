@@ -1,0 +1,9 @@
+version: '3'
+services:
+  socksproxy:
+    build: . 
+    container_name: dante_proxy
+    restart: always
+    ports:
+      - "62335:1080"
+
