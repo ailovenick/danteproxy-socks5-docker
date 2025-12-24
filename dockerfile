@@ -3,11 +3,20 @@ FROM wernight/dante
 # Переключаемся на root, чтобы иметь права создавать пользователей
 USER root
 
-# 1. Создаем пользователей (флаг -D в Alpine значит "без пароля", пароль задаем следом)
-# Синтаксис: echo "user:password" | chpasswd
+# Получаем список пользователей из docker-compose (.env)
+ARG PROXY_USERS
 
-RUN adduser -D -g '' user
-RUN echo "user:password" | chpasswd
+# Цикл по всем пользователям (разделитель - пробел)
+RUN for user_pair in $PROXY_USERS; do \
+      # Получаем имя (все до двоеточия)
+      username=${user_pair%%:*}; \
+      # Получаем пароль (все после двоеточия)
+      password=${user_pair#*:}; \
+      # Создаем пользователя
+      adduser -D -g '' "$username"; \
+      # Устанавливаем пароль
+      echo "$username:$password" | chpasswd; \
+    done
 
 # 2. Копируем наш кастомный конфиг, где включена авторизация
 COPY sockd.conf /etc/sockd.conf

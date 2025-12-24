@@ -1,9 +1,11 @@
 version: '3'
 services:
   socksproxy:
-    build: . 
+    build:
+      context: .
+      args:
+        - PROXY_USERS=${PROXY_USERS}
     container_name: dante_proxy
     restart: always
     ports:
       - "62335:1080"
-
